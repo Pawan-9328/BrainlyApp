@@ -1,10 +1,8 @@
 import express from "express"; 
 import  jwt  from "jsonwebtoken";
-import { UserModel } from "./db"; 
-
-
-
-const JWT_PASSWORD = "!23123"; 
+import { ContentModel, UserModel } from "./db";
+import { JWT_PASSWORD } from "./config"; 
+import { userMiddleware } from "./middleware";
 
 const app = express();
 app.use(express.json()); 
@@ -56,7 +54,21 @@ app.post("/api/v1/signin" ,async (req, res) =>{
  
 })
 
-app.post("/api/v1/content" , (req, res) =>{
+app.post("/api/v1/content", userMiddleware, async (req, res) => {
+  const link = req.body.link;
+  const type = req.body.type; 
+
+ await ContentModel.create({
+      link, 
+      type,
+      //@ts-ignore
+      userId: req.userId,
+      tags: [],
+
+  })
+   res.json({
+     message: "Content added"
+  })
 
 
 })
